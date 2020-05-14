@@ -38,6 +38,23 @@ def find_dataset_using_name(dataset_name):
     return dataset
 
 
+def find_dataset_using_name_single_dir(dataset_name):
+
+    dataset_filename = "data." + dataset_name + "_single_dir" + "_dataset"
+    datasetlib = importlib.import_module(dataset_filename)
+
+    dataset = None
+    target_dataset_name = dataset_name.replace('', '') + 'singledir' + 'dataset'
+    for name, cls in datasetlib.__dict__.items():
+        if name.lower() == target_dataset_name.lower() and issubclass(cls, BaseDataset):
+            dataset = cls
+
+    if dataset is None:
+        raise NotImplementedError("In %s.py, there should be a subclass of BaseDataset with class name that matches %s in lowercase." % (dataset_filename, target_dataset_name))
+
+    return dataset
+
+
 def get_option_setter(dataset_name):
     """Return the static method <modify_commandline_options> of the dataset class."""
     dataset_class = find_dataset_using_name(dataset_name)
@@ -57,6 +74,35 @@ def create_dataset(opt):
     data_loader = CustomDatasetDataLoader(opt)
     dataset = data_loader.load_data()
     return dataset
+
+
+# class SingleDirDatasetDataLoader():
+#
+#     def __init__(self, opt):
+#
+#         self.opt = opt
+#         dataset_clas = find_dataset_using_name_single_dir(opt.dataset_mode)
+#         self.dataset = dataset_clas(opt)
+#         print("dataset [%s] was created" % type(self.dataset).__name__)
+#         self.dataloader = torch.utils.data.DataLoader(
+#             self.dataset,
+#             batch_size=opt.batch_size,
+#             shuffle=not opt.serial_batches,
+#             num_workers=int(opt.num_threads))
+#
+#     def load_data(self):
+#         return self
+#
+#     def __len__(self):
+#         """Return the number of data in the dataset"""
+#         return min(len(self.dataset), self.opt.max_dataset_size)
+#
+#     def __iter__(self):
+#         """Return a batch of data"""
+#         for i, data in enumerate(self.dataloader):
+#             if i * self.opt.batch_size >= self.opt.max_dataset_size:
+#                 break
+#             yield data
 
 
 class CustomDatasetDataLoader():

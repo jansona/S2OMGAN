@@ -16,12 +16,12 @@ from util.visualizer import Visualizer
 if __name__ == '__main__':
     opt = TrainOptions().parse()   # get training options
     
-    opt.dataset_mode = 'aligned'
+    opt.dataset_mode = 'aligned' + ('_single_dir' if opt.single_dir else '')
     datasetP = create_dataset(opt)  # create a paired dataset
     datasetP_size = len(datasetP)   # get the number of images in the dataset.
     print('The number of paired training images = %d' % datasetP_size)
     
-    opt.dataset_mode = 'unaligned'
+    opt.dataset_mode = 'unaligned' + ('_single_dir' if opt.single_dir else '')
     datasetU = create_dataset(opt)  # create a unpaired dataset
     datasetU_size = len(datasetU)   # get the number of images in the dataset.
     print('The number of unpaired training images = %d' % datasetU_size)
