@@ -99,7 +99,7 @@ if __name__ == '__main__':
     opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
     opt.load_size = opt.crop_size
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-    opt.dataset_mode = 'unaligned' + ('_single_dir' if opt.single_dir is not None else '')
+    opt.dataset_mode = 'unaligned' + ('_single_dir' if opt.single_dir else '')
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)      # create a model given opt.model and other options
     model.setup(opt)               # regular setup: load and print networks; create schedulers

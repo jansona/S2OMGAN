@@ -55,7 +55,7 @@ class BaseOptions():
         parser.add_argument('--verbose', action='store_true', help='if specified, print more debugging information')
         parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{load_size}')
         # used to put all the images in a single dir
-        parser.add_argument('--single_dir', help='')
+        parser.add_argument('--single_dir', action='store_true', help='')
         self.initialized = True
         return parser
 
