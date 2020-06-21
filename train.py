@@ -12,18 +12,13 @@ from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
 from util.visualizer import Visualizer
-import json
-import sys
+from util.opt_json_loader import get_opt_json
+
 
 if __name__ == '__main__':
 
     # region get options from a json file
-    with open('./train.json', encoding='utf-8') as fin:
-        lines = fin.readlines()
-        options_str = '\n'.join(lines)
-
-        options_json = json.loads(options_str)
-        sys.argv += options_json
+    get_opt_json()
     # endregion
 
 

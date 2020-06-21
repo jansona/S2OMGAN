@@ -37,6 +37,7 @@ from util.visualizer import save_images
 from util import html
 import numpy as np
 from scipy.signal import convolve2d
+from util.opt_json_loader import get_opt_json
 
 def MSE(pic1, pic2):
     return np.sum(np.square(pic1 - pic2)) / (pic1.shape[0] * pic1.shape[1])
@@ -90,6 +91,11 @@ def compute_ssim(im1, im2, k1=0.01, k2=0.03, win_size=11, L=255):
     return np.mean(np.mean(ssim_map))
 
 if __name__ == '__main__':
+
+    # region get options from a json file
+    get_opt_json()
+    # endregion
+
     opt = TestOptions().parse()  # get test options
 #     opt.epoch = 200
     # hard-code some parameters for test
