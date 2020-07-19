@@ -13,6 +13,11 @@ import sys
 # import util
 
 if __name__ == '__main__':
+    
+    # region get options from a json file
+    get_opt_json()
+    # endregion
+
     sys.argv.extend(['--gpu_ids', '-1'])
     opt = TestOptions().parse()  # get test options
     opt.name = "demo_pretrained"
