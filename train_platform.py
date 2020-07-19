@@ -7,23 +7,22 @@ Example:
     Train a S2OMGAN model:
         python train.py --dataroot ./datasets/maps --name maps_somgan --model somgan
 """
-import time, os
+import time, os, torch
 from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
 from util.visualizer import Visualizer
-from util.opt_json_loader import get_opt_json
 
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except ImportError:
+    from tensorboardX import SummaryWriter
 
 if __name__ == '__main__':
-
-    # region get options from a json file
-    get_opt_json()
-    # endregion
-
     opt = TrainOptions().parse()   # get training options
+    opt.dataroot = opt.DATA_PATH
     
-    opt.dataset_mode = 'aligned' + ('_single_dir' if opt.single_dir else '')
+    opt.dataset_mode = 'aligned'
     if os.path.exists(opt.dataroot + "/train"):
         datasetP = create_dataset(opt)  # create a paired dataset
     else:
@@ -31,7 +30,7 @@ if __name__ == '__main__':
     datasetP_size = len(datasetP)   # get the number of images in the dataset.
     print('The number of paired training images = %d' % datasetP_size)
     
-    opt.dataset_mode = 'unaligned' + ('_single_dir' if opt.single_dir else '')
+    opt.dataset_mode = 'unaligned'
     if os.path.exists(opt.dataroot + "/trainA") and os.path.exists(opt.dataroot + "/trainB"):
         datasetU = create_dataset(opt)  # create a unpaired dataset
     else:
@@ -44,6 +43,8 @@ if __name__ == '__main__':
     visualizer = Visualizer(opt)   # create a visualizer that display/save images and plots
     total_iters = 0                # the total number of training iterations
 
+    tb_writer = SummaryWriter(opt.LOG_PATH)
+    
     for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
         epoch_start_time = time.time()  # timer for entire epoch
         iter_data_time = time.time()    # timer for data loading per iteration
@@ -60,10 +61,10 @@ if __name__ == '__main__':
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
 
-            if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
-                save_result = total_iters % opt.update_html_freq == 0
-                model.compute_visuals()
-                visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
+#             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
+#                 save_result = total_iters % opt.update_html_freq == 0
+#                 model.compute_visuals()
+#                 visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
@@ -71,11 +72,14 @@ if __name__ == '__main__':
                 visualizer.print_current_losses(epoch, epoch_iter, losses, t_comp, t_data)
                 if opt.display_id > 0:
                     visualizer.plot_current_losses(epoch, float(epoch_iter) / datasetU_size, losses)
+                
+                for name, val in losses.items():
+                    tb_writer.add_scalar("loss_" + name, val, total_iters)
 
-            if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
-                print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))
-                save_suffix = 'iter_%d' % total_iters if opt.save_by_iter else 'latest'
-                model.save_networks(save_suffix)
+#             if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
+#                 print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))
+#                 save_suffix = 'iter_%d' % total_iters if opt.save_by_iter else 'latest'
+#                 model.save_networks(save_suffix)
 
             iter_data_time = time.time()
             
@@ -90,10 +94,10 @@ if __name__ == '__main__':
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             model.optimize_parameters(lambda_paired_loss = 1., epoch_ratio = (1.*epoch/(opt.niter + opt.niter_decay)))   # calculate loss functions, get gradients, update network weights
 
-            if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
-                save_result = total_iters % opt.update_html_freq == 0
-                model.compute_visuals()
-                visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
+#             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
+#                 save_result = total_iters % opt.update_html_freq == 0
+#                 model.compute_visuals()
+#                 visualizer.display_current_results(model.get_current_visuals(), epoch, save_result)
 
             if total_iters % opt.print_freq == 0:    # print training losses and save logging information to the disk
                 losses = model.get_current_losses()
@@ -102,17 +106,29 @@ if __name__ == '__main__':
                 if opt.display_id > 0:
                     visualizer.plot_current_losses(epoch, float(epoch_iter) / datasetP_size, losses)
 
-            if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
-                print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))
-                save_suffix = 'iter_%d' % total_iters if opt.save_by_iter else 'latest'
-                model.save_networks(save_suffix)
+                for name, val in losses.items():
+                    tb_writer.add_scalar("loss_" + name, val, total_iters)
+                
+#             if total_iters % opt.save_latest_freq == 0:   # cache our latest model every <save_latest_freq> iterations
+#                 print('saving the latest model (epoch %d, total_iters %d)' % (epoch, total_iters))
+#                 save_suffix = 'iter_%d' % total_iters if opt.save_by_iter else 'latest'
+#                 model.save_networks(save_suffix)
 
             iter_data_time = time.time()
         
-        if epoch % opt.save_epoch_freq == 0:              # cache our model every <save_epoch_freq> epochs
-            print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
-            model.save_networks('latest')
-            model.save_networks(epoch)
+#         if epoch % opt.save_epoch_freq == 0:              # cache our model every <save_epoch_freq> epochs
+#             print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
+#             model.save_networks('latest')
+#             model.save_networks(epoch)
 
         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.niter + opt.niter_decay, time.time() - epoch_start_time))
         model.update_learning_rate()                     # update learning rates at the end of every epoch.
+
+
+# save net for platform.
+    net = getattr(model, 'netG_A')
+    if len(model.gpu_ids) > 0 and torch.cuda.is_available():
+        torch.save(net.module.cpu().state_dict(), opt.CHECKPOINT_PATH)
+        net.cuda(model.gpu_ids[0])
+    else:
+        torch.save(net.cpu().state_dict(), opt.CHECKPOINT_PATH)

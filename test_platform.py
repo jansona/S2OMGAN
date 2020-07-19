@@ -29,7 +29,7 @@ See options/base_options.py and options/test_options.py for more test options.
 See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
 See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 """
-import os, glob, cv2, time
+import os, glob, cv2, time, torch
 from options.test_options import TestOptions
 from data import create_dataset
 from models import create_model
@@ -37,7 +37,6 @@ from util.visualizer import save_images
 from util import html
 import numpy as np
 from scipy.signal import convolve2d
-from util.opt_json_loader import get_opt_json
 import json
 
 def MSE(pic1, pic2):
@@ -92,12 +91,8 @@ def compute_ssim(im1, im2, k1=0.01, k2=0.03, win_size=11, L=255):
     return np.mean(np.mean(ssim_map))
 
 if __name__ == '__main__':
-
-    # region get options from a json file
-    get_opt_json()
-    # endregion
-
     opt = TestOptions().parse()  # get test options
+    opt.dataroot = opt.DATA_PATH
 #     opt.epoch = 200
     # hard-code some parameters for test
     opt.num_threads = 0   # test code only supports num_threads = 1
@@ -106,12 +101,25 @@ if __name__ == '__main__':
     opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
     opt.load_size = opt.crop_size
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-    opt.dataset_mode = 'unaligned' + ('_single_dir' if opt.single_dir else '')
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)      # create a model given opt.model and other options
-    model.setup(opt)               # regular setup: load and print networks; create schedulers
+    # load model from a path - for platform
+    load_path = opt.MODEL_FILE
+    net = getattr(model, 'netG_A')
+    if isinstance(net, torch.nn.DataParallel):
+        net = net.module
+    print('loading the model from %s' % load_path)
+    state_dict = torch.load(load_path, map_location=str(model.device))
+    if hasattr(state_dict, '_metadata'):
+        del state_dict._metadata
+    # patch InstanceNorm checkpoints prior to 0.4
+    for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
+        model._BaseModel__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+    net.load_state_dict(state_dict)
+    model.print_networks(opt.verbose)
+    
     # create a website
-    web_dir = os.path.join(opt.results_dir, opt.name, '%s_%s' % (opt.phase, opt.epoch))  # define the website directory
+    web_dir = opt.OUTPUT_PATH # specific output dir - for platform
     webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
     # test with eval mode. This only affects layers like batchnorm and dropout.
     # For [pix2pix]: we use batchnorm and dropout in the original pix2pix. You can experiment it with and without eval() mode.
@@ -137,8 +145,9 @@ if __name__ == '__main__':
     print("Work Done!!!")
     print('Generated', len(dataset), 'maps. Total Time Cost: ', lasttime - starttime, 'seconds')
 
-#    r_report = {"tables" : [{"tableName": "测试汇报", "结果": {"瓦片个数": len(dataset), "总时长": lasttime - starttime}}]}
-#    print(r_report)
+    # export metrics results - for platform
+    r_report = {"tables" : [{"tableName": "测试汇报", "结果": {"瓦片个数": len(dataset), "总时长": lasttime - starttime}}]}
+#     print(r_report)
 
-#    with open(opt.RESULT_PATH, "w") as jsonof:
-#        json.dump(r_report, jsonof, ensure_ascii=False)
+    with open(opt.RESULT_PATH, "w") as jsonof:
+        json.dump(r_report, jsonof, ensure_ascii=False)

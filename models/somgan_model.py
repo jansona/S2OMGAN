@@ -53,13 +53,15 @@ class SomGANModel(BaseModel):
         if self.isTrain and self.opt.lambda_identity > 0.0:  # if identity loss is used, we also visualize idt_B=G_A(B) ad idt_A=G_A(B)
             visual_names_A.append('idt_B')
             visual_names_B.append('idt_A')
-
-        self.visual_names = visual_names_A + visual_names_B  # combine visualizations for A and B
+        if self.isTrain:
+            self.visual_names = ['real_A', 'fake_B'] #visual_names_A + visual_names_B  # combine visualizations for A and B
+        else:
+            self.visual_names = ["real_A", "fake_B", "real_B"]
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
         if self.isTrain:
             self.model_names = ['G_A', 'G_B', 'D_A', 'D_B']
         else:  # during test time, only load Gs
-            self.model_names = ['G_A', 'G_B']
+            self.model_names = ['G_A']
 
         # define networks (both Generators and discriminators)
         # The naming is different from those used in the paper.
@@ -109,10 +111,13 @@ class SomGANModel(BaseModel):
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
-        self.fake_B = self.netG_A(self.real_A)  # G_A(A)
-        self.rec_A = self.netG_B(self.fake_B)   # G_B(G_A(A))
-        self.fake_A = self.netG_B(self.real_B)  # G_B(B)
-        self.rec_B = self.netG_A(self.fake_A)   # G_A(G_B(B))
+        if self.isTrain:
+            self.fake_B = self.netG_A(self.real_A)  # G_A(A)
+            self.rec_A = self.netG_B(self.fake_B)   # G_B(G_A(A))
+            self.fake_A = self.netG_B(self.real_B)  # G_B(B)
+            self.rec_B = self.netG_A(self.fake_A)   # G_A(G_B(B))
+        else:
+            self.fake_B = self.netG_A(self.real_A)  # G_A(A)
 
     def backward_D_basic(self, netD, real, fake):
         """Calculate GAN loss for the discriminator

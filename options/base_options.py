@@ -20,7 +20,7 @@ class BaseOptions():
     def initialize(self, parser):
         """Define the common options that are used in both training and test."""
         # basic parameters
-        parser.add_argument('--dataroot', required=True, help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
+        parser.add_argument('--dataroot', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
         parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
@@ -56,6 +56,21 @@ class BaseOptions():
         parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{load_size}')
         # used to put all the images in a single dir
         parser.add_argument('--single_dir', action='store_true', help='')
+        # for platform tmp
+        parser.add_argument('--DATA_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--TRAIN_FILE_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--VAL_FILE_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--LOG_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--CHECKPOINT_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--TEST_FILE_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--PB_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--TEST_CLASSES', default='', type=str, help='tmp')
+        parser.add_argument('--RESULT_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--OUTPUT_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--MODEL_FILE', default='', type=str, help='tmp')
+        parser.add_argument('--PREDICT_CLASSES', default='', type=str, help='tmp')
+        parser.add_argument('--IMAGE_PATH', default='', type=str, help='tmp')
+        parser.add_argument('--IMAGE_BASE64', default='', type=str, help='tmp')
         self.initialized = True
         return parser
 
