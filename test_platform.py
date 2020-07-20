@@ -93,7 +93,7 @@ def compute_ssim(im1, im2, k1=0.01, k2=0.03, win_size=11, L=255):
 if __name__ == '__main__':
     
     # region get options from a json file
-    get_opt_json()
+    # get_opt_json()
     # endregion
 
     opt = TestOptions().parse()  # get test options

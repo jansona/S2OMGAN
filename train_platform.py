@@ -21,7 +21,7 @@ except ImportError:
 if __name__ == '__main__':
     
     # region get options from a json file
-    get_opt_json()
+    # get_opt_json()
     # endregion
 
     opt = TrainOptions().parse()   # get training options
