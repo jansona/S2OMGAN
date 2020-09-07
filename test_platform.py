@@ -276,27 +276,27 @@ if __name__ == '__main__':
     print ("integrated done")
                 
 # region 计算指标measure并生成排序文件
-    def generate_ranking_file():
-        result_path = os.path.join(opt.OUTPUT_PATH, "images")
-        realB_names = glob.glob("{}/*_real_B.png".format(result_path))
+    # def generate_ranking_file():
+    #     result_path = os.path.join(opt.OUTPUT_PATH, "images")
+    #     realB_names = glob.glob("{}/*_real_B.png".format(result_path))
 
-        results_with_metric = []
-        sum_metric = 0
-        suffix_len = len("_real_B.png")
-        for n in realB_names:
-            measure = cal_measure(n)
-            sum_metric += measure
-            results_with_metric.append((n.split("/")[-1][:len(n)-suffix_len], measure))
+    #     results_with_metric = []
+    #     sum_metric = 0
+    #     suffix_len = len("_real_B.png")
+    #     for n in realB_names:
+    #         measure = cal_measure(n)
+    #         sum_metric += measure
+    #         results_with_metric.append((n.split("/")[-1][:len(n)-suffix_len], measure))
 
-        results_with_metric.sort(key=lambda x:x[1], reverse=True)
+    #     results_with_metric.sort(key=lambda x:x[1], reverse=True)
 
-        with open("{}/images/metric_ranking.txt".format(opt.OUTPUT_PATH), "w", encoding="utf-8") as fout:
-            for sample_num, sample_metric in results_with_metric:
-                fout.write("{}:{}\n".format(sample_num, sample_metric))
+    #     with open("{}/images/metric_ranking.txt".format(opt.OUTPUT_PATH), "w", encoding="utf-8") as fout:
+    #         for sample_num, sample_metric in results_with_metric:
+    #             fout.write("{}:{}\n".format(sample_num, sample_metric))
                 
-        return sum_metric / len(realB_names)
+    #     return sum_metric / len(realB_names)
 
-    avg_metric = generate_ranking_file()
+    # avg_metric = generate_ranking_file()
 # endregion
     
     # export metrics results - for platform
