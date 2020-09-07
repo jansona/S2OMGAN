@@ -108,20 +108,21 @@ if __name__ == '__main__':
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)      # create a model given opt.model and other options
-    # load model from a path - for platform
-    load_path = opt.MODEL_FILE
-    net = getattr(model, 'netG_A')
-    if isinstance(net, torch.nn.DataParallel):
-        net = net.module
-    print('loading the model from %s' % load_path)
-    state_dict = torch.load(load_path, map_location=str(model.device))
-    if hasattr(state_dict, '_metadata'):
-        del state_dict._metadata
-    # patch InstanceNorm checkpoints prior to 0.4
-    for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
-        model._BaseModel__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
-    net.load_state_dict(state_dict)
-    model.print_networks(opt.verbose)
+    model.setup(opt)
+    # # load model from a path - for platform
+    # load_path = opt.MODEL_FILE
+    # net = getattr(model, 'netG_A')
+    # if isinstance(net, torch.nn.DataParallel):
+    #     net = net.module
+    # print('loading the model from %s' % load_path)
+    # state_dict = torch.load(load_path, map_location=str(model.device))
+    # if hasattr(state_dict, '_metadata'):
+    #     del state_dict._metadata
+    # # patch InstanceNorm checkpoints prior to 0.4
+    # for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
+    #     model._BaseModel__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+    # net.load_state_dict(state_dict)
+    # model.print_networks(opt.verbose)
     
     # create a website
     web_dir = opt.OUTPUT_PATH # specific output dir - for platform
