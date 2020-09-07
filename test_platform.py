@@ -302,8 +302,7 @@ if __name__ == '__main__':
     # export metrics results - for platform
     r_report = {"tables" : [{"tableName": "测试汇报", "结果": {
         "瓦片个数": len(dataset), 
-        "总时长": lasttime - starttime,
-        "指标": avg_metric
+        "总时长": lasttime - starttime
     }}]}
 #     print(r_report)
 
