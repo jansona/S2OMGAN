@@ -16,7 +16,9 @@ Example (You need to train models first or download pre-trained models from our 
     Test a SOMGAN model:
         python test.py --dataroot datasets/maps --name maps_somgan --model somgan
 
-    The option '--model test' is used for generating CycleGAN results only for one side.
+    The option '--model test' is used for g
+
+    enerating CycleGAN results only for one side.
     This option will automatically set '--dataset_mode single', which only loads the images from one set.
     On the contrary, using '--model cycle_gan' requires loading and generating results in both directions,
     which is sometimes unnecessary. The results will be saved at ./results/.
