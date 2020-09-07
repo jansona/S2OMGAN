@@ -1,184 +1,189 @@
-"""General-purpose test script for image-to-image translation.
 
-Once you have trained your model with train.py, you can use this script to test the model.
-It will load a saved model from --checkpoints_dir and save the results to --results_dir.
+def test_function(params):
+    """General-purpose test script for image-to-image translation.
 
-It first creates model and dataset given the option. It will hard-code some parameters.
-It then runs inference for --num_test images and save results to an HTML file.
+    Once you have trained your model with train.py, you can use this script to test the model.
+    It will load a saved model from --checkpoints_dir and save the results to --results_dir.
 
-Example (You need to train models first or download pre-trained models from our website):
-    Test a CycleGAN model (both sides):
-        python test.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
+    It first creates model and dataset given the option. It will hard-code some parameters.
+    It then runs inference for --num_test images and save results to an HTML file.
 
-    Test a CycleGAN model (one side only):
-        python test.py --dataroot datasets/horse2zebra/testA --name horse2zebra_pretrained --model test --no_dropout
+    Example (You need to train models first or download pre-trained models from our website):
+        Test a CycleGAN model (both sides):
+            python test.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
 
-    Test a SOMGAN model:
-        python test.py --dataroot datasets/maps --name maps_somgan --model somgan
+        Test a CycleGAN model (one side only):
+            python test.py --dataroot datasets/horse2zebra/testA --name horse2zebra_pretrained --model test --no_dropout
 
-    The option '--model test' is used for generating CycleGAN results only for one side.
-    This option will automatically set '--dataset_mode single', which only loads the images from one set.
-    On the contrary, using '--model cycle_gan' requires loading and generating results in both directions,
-    which is sometimes unnecessary. The results will be saved at ./results/.
-    Use '--results_dir <directory_path_to_save_result>' to specify the results directory.
+        Test a SOMGAN model:
+            python test.py --dataroot datasets/maps --name maps_somgan --model somgan
 
-    Test a pix2pix model:
-        python test.py --dataroot ./datasets/facades --name facades_pix2pix --model pix2pix --direction BtoA
+        The option '--model test' is used for generating CycleGAN results only for one side.
+        This option will automatically set '--dataset_mode single', which only loads the images from one set.
+        On the contrary, using '--model cycle_gan' requires loading and generating results in both directions,
+        which is sometimes unnecessary. The results will be saved at ./results/.
+        Use '--results_dir <directory_path_to_save_result>' to specify the results directory.
 
-See options/base_options.py and options/test_options.py for more test options.
-See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
-See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
-"""
-import os, glob, cv2, time, torch, math
-from options.test_options import TestOptions
-from data import create_dataset
-from models import create_model
-from util.visualizer import save_images
-from util import html
-import numpy as np
-from scipy.signal import convolve2d
-import json
+        Test a pix2pix model:
+            python test.py --dataroot ./datasets/facades --name facades_pix2pix --model pix2pix --direction BtoA
 
-
-def MSE(pic1, pic2):
-    return np.sum(np.square(pic1 - pic2)) / (pic1.shape[0] * pic1.shape[1])
-
-def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
+    See options/base_options.py and options/test_options.py for more test options.
+    See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
+    See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
     """
-    2D gaussian mask - should give the same result as MATLAB's
-    fspecial('gaussian',[shape],[sigma])
-    """
-    m,n = [(ss-1.)/2. for ss in shape]
-    y,x = np.ogrid[-m:m+1,-n:n+1]
-    h = np.exp( -(x*x + y*y) / (2.*sigma*sigma) )
-    h[ h < np.finfo(h.dtype).eps*h.max() ] = 0
-    sumh = h.sum()
-    if sumh != 0:
-        h /= sumh
-    return h
-
-def filter2(x, kernel, mode='same'):
-    return convolve2d(x, np.rot90(kernel, 2), mode=mode)
-
-d_name = os.path.dirname(__file__)
+    import os, glob, cv2, time, torch, math
+    from options.test_options import TestOptions
+    from data import create_dataset
+    from models import create_model
+    from util.visualizer import save_images
+    from util import html
+    import numpy as np
+    from scipy.signal import convolve2d
+    import json
 
 
-x_size = 17
-y_size = 20
-zoom = 17
+    def MSE(pic1, pic2):
+        return np.sum(np.square(pic1 - pic2)) / (pic1.shape[0] * pic1.shape[1])
+
+    def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
+        """
+        2D gaussian mask - should give the same result as MATLAB's
+        fspecial('gaussian',[shape],[sigma])
+        """
+        m,n = [(ss-1.)/2. for ss in shape]
+        y,x = np.ogrid[-m:m+1,-n:n+1]
+        h = np.exp( -(x*x + y*y) / (2.*sigma*sigma) )
+        h[ h < np.finfo(h.dtype).eps*h.max() ] = 0
+        sumh = h.sum()
+        if sumh != 0:
+            h /= sumh
+        return h
+
+    def filter2(x, kernel, mode='same'):
+        return convolve2d(x, np.rot90(kernel, 2), mode=mode)
+
+    d_name = os.path.dirname(__file__)
 
 
-def num2deg(y,x,zoom):
-    n=2**zoom
-    lon_deg=x/n*360.0-180.0
-    lat_deg=math.atan(math.sinh(math.pi * (1 - 2 * y / n)))
-    lat_deg=lat_deg*180.0/math.pi
-    return [lon_deg,lat_deg]
+    x_size = 17
+    y_size = 20
+    zoom = 17
 
-def integrate_tiles(tile_mat: [[str]]) -> np.array:
-    
-    def assemble_row(row_files: [str]) -> np.array:
+
+    def num2deg(y,x,zoom):
+        n=2**zoom
+        lon_deg=x/n*360.0-180.0
+        lat_deg=math.atan(math.sinh(math.pi * (1 - 2 * y / n)))
+        lat_deg=lat_deg*180.0/math.pi
+        return [lon_deg,lat_deg]
+
+    def integrate_tiles(tile_mat: [[str]]) -> np.array:
         
-        tile_cated = cv2.imread(os.path.join(d_name,row_files[0]))
-        
-        for file in row_files[1:]:
-            temp_tile = cv2.imread(os.path.join(d_name,file))
-            array_temp = np.array(temp_tile)
-            if array_temp.ndim == 0:
-                break
-            tile_cated = np.concatenate((tile_cated, temp_tile), axis=1)
+        def assemble_row(row_files: [str]) -> np.array:
             
-        return tile_cated
-    
-    rows = []
-    
-    for row in tile_mat:
-        rows.append(assemble_row(row))
+            tile_cated = cv2.imread(os.path.join(d_name,row_files[0]))
+            
+            for file in row_files[1:]:
+                temp_tile = cv2.imread(os.path.join(d_name,file))
+                array_temp = np.array(temp_tile)
+                if array_temp.ndim == 0:
+                    break
+                tile_cated = np.concatenate((tile_cated, temp_tile), axis=1)
+                
+            return tile_cated
         
-    map_cated = rows[0]
-    
-    for row in rows[1:]:
-        map_cated = np.concatenate((map_cated, row), axis=0)
+        rows = []
         
-    return map_cated
+        for row in tile_mat:
+            rows.append(assemble_row(row))
+            
+        map_cated = rows[0]
+        
+        for row in rows[1:]:
+            map_cated = np.concatenate((map_cated, row), axis=0)
+            
+        return map_cated
 
-def statis_value(in_path):
-    name_list = os.listdir(in_path)
-    y_list = []
-    x_list = []
-    for name in name_list:
-        a = name.split('_',2)
-        y_list.append(int(a[0]))
-        x_list.append(int(a[1]))
-    x_min,x_max = min(x_list),max(x_list)
-    y_min,y_max = min(y_list),max(y_list)
-    return x_min,x_max,y_min,y_max
+    def statis_value(in_path):
+        name_list = os.listdir(in_path)
+        y_list = []
+        x_list = []
+        for name in name_list:
+            a = name.split('_',2)
+            y_list.append(int(a[0]))
+            x_list.append(int(a[1]))
+        x_min,x_max = min(x_list),max(x_list)
+        y_min,y_max = min(y_list),max(y_list)
+        return x_min,x_max,y_min,y_max
 
-def AutoContrast(img, flag = 1):
-    """RGB影像自动对比度调整
-       @img 输入影像
-       @flag 处理范围计算方式 1:转为灰度计算最值 2:三个波段最值的最值 3:三个波段最值均值"""
-    #根据影像灰度计算调整范围
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #根据拉伸百分比决定拉伸范围
-    if flag == 1:
-        minp = np.min(np.min(img_gray))
-        maxp = np.max(np.max(img_gray))
-    elif flag == 2:
-        minp = np.min(np.min(img))
-        maxp = np.max(np.max(img))
-    elif flag == 3:
-        minn = np.zeros((1, 3), dtype = float)
-        maxn = np.zeros((1, 3), dtype = float)
-        for i in range(3):
-            minn[0, i] = np.min(np.min(img[:, :, i]))
-            maxn[0, i] = np.max(np.max(img[:, :, i]))
-        minp = np.mean(minn)
-        maxp = np.mean(maxn)
-    else:
-        raise Exception('the flag can only be 1 or 2')
-    #RGB进行相同的调整
-    img = img.astype(np.float)
-    deart = float(maxp - minp)
-    imgout = img.copy()
-    imgout[:, :, 0] = 255*(img[:, :, 0] - minp) / deart
-    imgout[:, :, 1] = 255*(img[:, :, 1] - minp) / deart
-    imgout[:, :, 2] = 255*(img[:, :, 2] - minp) / deart
-    imgout = imgout.astype(np.uint8)
-    return imgout
+    def AutoContrast(img, flag = 1):
+        """RGB影像自动对比度调整
+        @img 输入影像
+        @flag 处理范围计算方式 1:转为灰度计算最值 2:三个波段最值的最值 3:三个波段最值均值"""
+        #根据影像灰度计算调整范围
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #根据拉伸百分比决定拉伸范围
+        if flag == 1:
+            minp = np.min(np.min(img_gray))
+            maxp = np.max(np.max(img_gray))
+        elif flag == 2:
+            minp = np.min(np.min(img))
+            maxp = np.max(np.max(img))
+        elif flag == 3:
+            minn = np.zeros((1, 3), dtype = float)
+            maxn = np.zeros((1, 3), dtype = float)
+            for i in range(3):
+                minn[0, i] = np.min(np.min(img[:, :, i]))
+                maxn[0, i] = np.max(np.max(img[:, :, i]))
+            minp = np.mean(minn)
+            maxp = np.mean(maxn)
+        else:
+            raise Exception('the flag can only be 1 or 2')
+        #RGB进行相同的调整
+        img = img.astype(np.float)
+        deart = float(maxp - minp)
+        imgout = img.copy()
+        imgout[:, :, 0] = 255*(img[:, :, 0] - minp) / deart
+        imgout[:, :, 1] = 255*(img[:, :, 1] - minp) / deart
+        imgout[:, :, 2] = 255*(img[:, :, 2] - minp) / deart
+        imgout = imgout.astype(np.uint8)
+        return imgout
 
-def compute_ssim(im1, im2, k1=0.01, k2=0.03, win_size=11, L=255):
+    def compute_ssim(im1, im2, k1=0.01, k2=0.03, win_size=11, L=255):
 
-    if not im1.shape == im2.shape:
-        raise ValueError("Input Imagees must have the same dimensions")
-    if len(im1.shape) > 2:
-        raise ValueError("Please input the images with 1 channel")
+        if not im1.shape == im2.shape:
+            raise ValueError("Input Imagees must have the same dimensions")
+        if len(im1.shape) > 2:
+            raise ValueError("Please input the images with 1 channel")
 
-    M, N = im1.shape
-    C1 = (k1*L)**2
-    C2 = (k2*L)**2
-    window = matlab_style_gauss2D(shape=(win_size,win_size), sigma=1.5)
-    window = window/np.sum(np.sum(window))
+        M, N = im1.shape
+        C1 = (k1*L)**2
+        C2 = (k2*L)**2
+        window = matlab_style_gauss2D(shape=(win_size,win_size), sigma=1.5)
+        window = window/np.sum(np.sum(window))
 
-    if im1.dtype == np.uint8:
-        im1 = np.double(im1)
-    if im2.dtype == np.uint8:
-        im2 = np.double(im2)
+        if im1.dtype == np.uint8:
+            im1 = np.double(im1)
+        if im2.dtype == np.uint8:
+            im2 = np.double(im2)
 
-    mu1 = filter2(im1, window, 'valid')
-    mu2 = filter2(im2, window, 'valid')
-    mu1_sq = mu1 * mu1
-    mu2_sq = mu2 * mu2
-    mu1_mu2 = mu1 * mu2
-    sigma1_sq = filter2(im1*im1, window, 'valid') - mu1_sq
-    sigma2_sq = filter2(im2*im2, window, 'valid') - mu2_sq
-    sigmal2 = filter2(im1*im2, window, 'valid') - mu1_mu2
+        mu1 = filter2(im1, window, 'valid')
+        mu2 = filter2(im2, window, 'valid')
+        mu1_sq = mu1 * mu1
+        mu2_sq = mu2 * mu2
+        mu1_mu2 = mu1 * mu2
+        sigma1_sq = filter2(im1*im1, window, 'valid') - mu1_sq
+        sigma2_sq = filter2(im2*im2, window, 'valid') - mu2_sq
+        sigmal2 = filter2(im1*im2, window, 'valid') - mu1_mu2
 
-    ssim_map = ((2*mu1_mu2+C1) * (2*sigmal2+C2)) / ((mu1_sq+mu2_sq+C1) * (sigma1_sq+sigma2_sq+C2))
+        ssim_map = ((2*mu1_mu2+C1) * (2*sigmal2+C2)) / ((mu1_sq+mu2_sq+C1) * (sigma1_sq+sigma2_sq+C2))
 
-    return np.mean(np.mean(ssim_map))
+        return np.mean(np.mean(ssim_map))
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
+
+    sys.argv = params
+
     opt = TestOptions().parse()  # get test options
     opt.dataroot = opt.DATA_PATH
 #     opt.epoch = 200

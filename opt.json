@@ -1,0 +1,6 @@
+{
+    "task": "train",
+    "dataroot": "datasets/test",
+    "name": "demo_name",
+    "model": "smapgan"
+}

@@ -1,28 +1,33 @@
-"""
-Example:
-    Train a CycleGAN model:
-        python train.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
-    Train a pix2pix model:
-        python train.py --dataroot ./datasets/maps --name maps_pix2pix --model pix2pix --direction BtoA
-    Train a S2OMGAN model:
-        python train.py --dataroot ./datasets/maps --name maps_somgan --model somgan
-"""
-import time, os, torch
-from options.train_options import TrainOptions
-from data import create_dataset
-from models import create_model
-from util.visualizer import Visualizer
 
-try:
-    from torch.utils.tensorboard import SummaryWriter
-except ImportError:
-    from tensorboardX import SummaryWriter
+def train_function(params):
 
-if __name__ == '__main__':
+    """
+    Example:
+        Train a CycleGAN model:
+            python train.py --dataroot ./datasets/maps --name maps_cyclegan --model cycle_gan
+        Train a pix2pix model:
+            python train.py --dataroot ./datasets/maps --name maps_pix2pix --model pix2pix --direction BtoA
+        Train a S2OMGAN model:
+            python train.py --dataroot ./datasets/maps --name maps_somgan --model somgan
+    """
+    import sys, time, os, torch
+    from options.train_options import TrainOptions
+    from data import create_dataset
+    from models import create_model
+    from util.visualizer import Visualizer
+
+    try:
+        from torch.utils.tensorboard import SummaryWriter
+    except ImportError:
+        from tensorboardX import SummaryWriter
+
+# if __name__ == '__main__':
     
     # region get options from a json file
     # get_opt_json()
     # endregion
+
+    sys.argv = params
 
     opt = TrainOptions().parse()   # get training options
     opt.dataroot = opt.DATA_PATH
