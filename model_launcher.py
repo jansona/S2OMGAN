@@ -7,11 +7,12 @@ TRAIN = 'train'
 TEST = 'test'
 ADD_NODE = 'add_node'
 
-MAPNIK_SERVICE_URL = ""
+MAPNIK_SERVICE_URL = "http://125.220.157.225:8383/add_note"
 
 
 def get_noded_img(location, output_path):
-    raw_data_b64 = requests.get("{}?location={}".format(MAPNIK_SERVICE_URL, location))
+    raw_data_b64 = requests.get("{}?location={}".format(MAPNIK_SERVICE_URL, location)).content
+    # print(raw_data_b64)
     img_data = base64.b64decode(raw_data_b64)
     
     with open(output_path, "wb") as fout:
