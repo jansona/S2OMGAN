@@ -31,7 +31,7 @@ def test_function(params):
     See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
     See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
     """
-    import os, glob, cv2, time, torch, math
+    import sys, os, glob, cv2, time, torch, math
     from options.test_options import TestOptions
     from data import create_dataset
     from models import create_model
