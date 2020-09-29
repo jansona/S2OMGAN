@@ -10,6 +10,7 @@ import json
 from PIL import Image
 from data.base_dataset import BaseDataset, get_params, get_transform
 import sys
+from glob import glob
 # import util
 
 if __name__ == '__main__':
@@ -55,20 +56,44 @@ if __name__ == '__main__':
     starttime = time.time()
     
     print(opt.IMAGE_PATH, opt.RESULT_PATH)
-    input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
-    transform_params = get_params(opt, input_img.size)
-    transformer = get_transform(opt, transform_params, grayscale=(opt.input_nc == 1))
-    x = transformer(input_img)
-#     print(type(x), x.shape, x)
-    
-    model.real_A = x.unsqueeze(0).to(model.device)
-    model.forward()
-    x = model.fake_B[0]
-#     print(type(x), x.shape, x)
+    source_path = opt.IMAGE_PATH
 
-    x = (np.transpose(x.detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
-    x = x.astype(np.uint8)
+    if sys.path.isdir(source_path):
+        for name_path in glob("{}/*".format(source_path)):
+            img_name = name_path.split("/")[-1]
+            input_img = Image.open(name_path).convert('RGB')
+            transform_params = get_params(opt, input_img.size)
+            transformer = get_transform(opt, transform_params, grayscale=(opt.input_nc == 1))
+            x = transformer(input_img)
+        #     print(type(x), x.shape, x)
+            
+            model.real_A = x.unsqueeze(0).to(model.device)
+            model.forward()
+            x = model.fake_B[0]
+        #     print(type(x), x.shape, x)
 
-    outimg = Image.fromarray(x)
-    outimg = outimg.resize(input_img.size)
-    outimg.save( opt.RESULT_PATH)
+            x = (np.transpose(x.detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
+            x = x.astype(np.uint8)
+
+            outimg = Image.fromarray(x)
+            outimg = outimg.resize(input_img.size)
+            outimg.save("{}/{}".format(opt.RESULT_PATH, img_name))
+
+    else:
+        input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
+        transform_params = get_params(opt, input_img.size)
+        transformer = get_transform(opt, transform_params, grayscale=(opt.input_nc == 1))
+        x = transformer(input_img)
+    #     print(type(x), x.shape, x)
+        
+        model.real_A = x.unsqueeze(0).to(model.device)
+        model.forward()
+        x = model.fake_B[0]
+    #     print(type(x), x.shape, x)
+
+        x = (np.transpose(x.detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
+        x = x.astype(np.uint8)
+
+        outimg = Image.fromarray(x)
+        outimg = outimg.resize(input_img.size)
+        outimg.save( opt.RESULT_PATH)
