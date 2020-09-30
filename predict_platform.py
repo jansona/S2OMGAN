@@ -245,4 +245,4 @@ if __name__ == '__main__':
         else:
             print("Please assign param 'task'")
 
-    predict_function(params)
+    predict_function(['./predict_platform.py'] + params)
