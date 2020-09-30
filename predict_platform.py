@@ -165,7 +165,7 @@ def predict_function(params):
         print("start integrating...")
         
         # in_path = webpage.get_image_dir()
-        in_path = os.RESULT_PATH
+        in_path = opt.RESULT_PATH
         # out_path = in_path[:-6] + "integrated"
         out_path = in_path
         if not os.path.exists(out_path):
