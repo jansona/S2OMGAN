@@ -5,7 +5,7 @@ def predict_function(params):
     # get_opt_json()
     # endregion
 
-    import os, glob, cv2, time, torch, math
+    import os, glob, cv2, time, torch, math, re
     from options.test_options import TestOptions
     from data import create_dataset
     from models import create_model
@@ -143,7 +143,9 @@ def predict_function(params):
     source_path = opt.IMAGE_PATH
 
     if os.path.isdir(source_path):
-        for name_path in glob("{}/*".format(source_path)):
+        tile_names = glob("{}/*".format(source_path))
+        tile_names = list(filter(lambda x: re.match("\d+_\d+.png", x), tile_names))
+        for name_path in tile_names:
             img_name = name_path.split("/")[-1]
             input_img = Image.open(name_path).convert('RGB')
             transform_params = get_params(opt, input_img.size)
