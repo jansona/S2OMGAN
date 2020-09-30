@@ -1,10 +1,12 @@
 import sys, json, requests, base64
 from train_platform import train_function
 from test_platform import test_function
+from predict_platform import predict_function
 
 
 TRAIN = 'train'
 TEST = 'test'
+PREDICT = 'predict'
 ADD_NODE = 'add_node'
 
 MAPNIK_SERVICE_URL = "http://125.220.157.225:8383/add_note"
@@ -41,6 +43,8 @@ def __main__():
         train_function(['./train_platform.py'] + params)
     elif action == TEST:
         test_function(['./test_platform.py'] + params)
+    elif action == PREDICT:
+        predict_function(['./predict_platform.py'] + params)
     elif action == ADD_NODE:
         print("Tagging...")
         get_noded_img(opt_json['data'], opt_json['outPath'])
