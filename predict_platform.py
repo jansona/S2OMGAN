@@ -53,6 +53,8 @@ def predict_function(params):
         y_list = []
         x_list = []
         for name in name_list:
+            name = name.split("/")[-1]
+            name = name.split(".")[0]
             a = name.split('_',2)
             y_list.append(int(a[0]))
             x_list.append(int(a[1]))
