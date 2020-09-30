@@ -140,7 +140,7 @@ def predict_function(params):
     print(opt.IMAGE_PATH, opt.RESULT_PATH)
     source_path = opt.IMAGE_PATH
 
-    if sys.path.isdir(source_path):
+    if os.path.isdir(source_path):
         for name_path in glob("{}/*".format(source_path)):
             img_name = name_path.split("/")[-1]
             input_img = Image.open(name_path).convert('RGB')
