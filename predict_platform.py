@@ -174,8 +174,8 @@ def predict_function(params):
             os.makedirs(out_path)
 
         x_min, x_max, y_min, y_max = statis_value(in_path)
-        x_size = x_max - x_min
-        y_size = y_max - y_min
+        x_size = x_max - x_min + 1
+        y_size = y_max - y_min + 1
         zoom = 17
                 
         tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
@@ -185,7 +185,7 @@ def predict_function(params):
         for i in range(x_size):
             temp_list = []
             for j in range(y_size):
-                temp_list.append(base_path + file_template.format(y_min + j, x_min + i))
+                temp_list.append(file_template.format(y_min + j, x_min + i))
                 
             tile_files.append(temp_list)
     
