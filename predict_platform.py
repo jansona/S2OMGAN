@@ -174,7 +174,7 @@ def predict_function(params):
         print("start integrating...")
         
         # in_path = webpage.get_image_dir()
-        in_path = opt.RESULT_PATH
+        in_path = result_dir_path 
         # out_path = in_path[:-6] + "integrated"
         out_path = in_path
         if not os.path.exists(out_path):
@@ -204,7 +204,7 @@ def predict_function(params):
         
         [lon,lat] = num2deg(x_min, y_min, zoom)
         tfw.extend([lon,lat])
-        file_tfw=open(os.path.join(result_dir_path, opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w'))
+        file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
         for i in range(6):
             tfw_name = str(tfw[i])+'\n'
             file_tfw.write(tfw_name) 
