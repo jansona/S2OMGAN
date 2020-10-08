@@ -227,22 +227,23 @@ def predict_function(params):
 if __name__ == '__main__':
     import sys, json
 
-    json_file_name = sys.argv[1]
+    # json_file_name = sys.argv[1]
 
-    params = []
-    action = ""
+    # params = []
+    # action = ""
 
-    with open(json_file_name, 'rb') as fin:
-        opt_json = json.load(fin)
+    # with open(json_file_name, 'rb') as fin:
+    #     opt_json = json.load(fin)
 
-        if "task" in opt_json.keys():
-            for k, v in opt_json.items():
-                if k == 'task':
-                    action = v
-                else:
-                    params.append("--{}".format(k))
-                    params.append("{}".format(v))
-        else:
-            print("Please assign param 'task'")
+    #     if "task" in opt_json.keys():
+    #         for k, v in opt_json.items():
+    #             if k == 'task':
+    #                 action = v
+    #             else:
+    #                 params.append("--{}".format(k))
+    #                 params.append("{}".format(v))
+    #     else:
+    #         print("Please assign param 'task'")
 
-    predict_function(['./predict_platform.py'] + params)
+    # predict_function(['./predict_platform.py'] + params)
+    predict_function(sys.argv)
