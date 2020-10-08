@@ -144,6 +144,10 @@ def predict_function(params):
     source_path = opt.IMAGE_PATH
 
     if os.path.isdir(source_path):
+        opt.RESULT_PATH = opt.RESULT_PATH.split('.')[0] + '.tif'
+        result_dir_path = '/'.join(opt.RESULT_PATH.split('/')[:-1])
+        temp_img_paths = []
+        temp_suffix_name = glob("{}/*".format(source_path))[0].split('.')[-1]
         for name_path in glob("{}/*".format(source_path)):
             img_name = name_path.split("/")[-1]
             input_img = Image.open(name_path).convert('RGB')
@@ -162,7 +166,9 @@ def predict_function(params):
 
             outimg = Image.fromarray(x)
             outimg = outimg.resize(input_img.size)
-            outimg.save("{}/{}".format(opt.RESULT_PATH, img_name))
+            temp_img_path = "{}/{}".format(result_dir_path, img_name)
+            temp_img_paths.append(temp_img_path)
+            outimg.save(temp_img_path)
 
         # automatic integrate and autocontrast - for platform
         print("start integrating...")
@@ -181,7 +187,7 @@ def predict_function(params):
                 
         tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         base_path = in_path + "/"
-        file_template = "{}_{}.png"
+        file_template = "{}_{}." + temp_suffix_name
         tile_files = []
         for i in range(x_size):
             temp_list = []
@@ -190,18 +196,26 @@ def predict_function(params):
                 
             tile_files.append(temp_list)
     
-        map_pic = integrate_tiles(opt.RESULT_PATH, tile_files)
-        cv2.imwrite(os.path.join(out_path, "{}_{}.tif".format(y_min, x_min)), map_pic)
+        map_pic = integrate_tiles(result_dir_path, tile_files)
+        cv2.imwrite(opt.RESULT_PATH, map_pic)
         
-        nimg = AutoContrast(map_pic, 3)
-        cv2.imwrite(os.path.join(out_path, "{}_{}_autocontrast.jpg".format(y_min, x_min)), nimg)
+        # nimg = AutoContrast(map_pic, 3)
+        # cv2.imwrite(os.path.join(out_path, "{}_{}_autocontrast.jpg".format(y_min, x_min)), nimg)
         
         [lon,lat] = num2deg(x_min, y_min, zoom)
         tfw.extend([lon,lat])
-        file_tfw=open(os.path.join(out_path,"{}_{}.tfw".format(y_min, x_min)),mode='w')
+        file_tfw=open(os.path.join(result_dir_path, opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w'))
         for i in range(6):
             tfw_name = str(tfw[i])+'\n'
-            file_tfw.write(tfw_name)
+            file_tfw.write(tfw_name) 
+
+        # delete temp img
+        for p in temp_img_paths:
+            if os.path.exists(p):
+                os.remove(p)
+            else:
+                print(p, 'not exists')
+
         print ("integrated done")
 
     else:
@@ -221,7 +235,7 @@ def predict_function(params):
 
         outimg = Image.fromarray(x)
         outimg = outimg.resize(input_img.size)
-        outimg.save( opt.RESULT_PATH)
+        outimg.save(opt.RESULT_PATH)
 
 
 if __name__ == '__main__':
