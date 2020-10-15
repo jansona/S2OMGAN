@@ -22,6 +22,11 @@ def predict_function(params):
 
 
     def integrate_tiles(d_name, tile_mat: [[str]]) -> np.array:
+
+        for line in tile_mat:
+            for tile in line:
+                if not os.path.exists("{}/{}".format(d_name, tile)):
+                    print(d_name, tile)
         
         def assemble_row(row_files: [str]) -> np.array:
             
@@ -187,7 +192,7 @@ def predict_function(params):
                 
         tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         base_path = in_path + "/"
-        file_template = "{}_{}." + temp_suffix_name
+        file_template = "{:06d}_{:06d}." + temp_suffix_name
         tile_files = []
         for i in range(x_size):
             temp_list = []
