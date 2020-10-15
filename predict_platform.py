@@ -5,6 +5,11 @@ def predict_function(params):
     # get_opt_json()
     # endregion
 
+    # 地图尺度与坐标位宽的映射
+    zoom2width = {
+        17: 6
+    }
+
     import os, glob, cv2, time, torch, math, re
     from options.test_options import TestOptions
     from data import create_dataset
@@ -188,11 +193,12 @@ def predict_function(params):
         x_min, x_max, y_min, y_max = statis_value(in_path)
         x_size = x_max - x_min + 1
         y_size = y_max - y_min + 1
-        zoom = 17
+        zoom = opt.zoom
+        coord_width = zoom2width[zoom]
                 
         tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         base_path = in_path + "/"
-        file_template = "{:06d}_{:06d}." + temp_suffix_name
+        file_template = "{:0%dd}_{:0%dd}." %(coord_width, coord_width) + temp_suffix_name
         tile_files = []
         for i in range(x_size):
             temp_list = []
