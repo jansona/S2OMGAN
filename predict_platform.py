@@ -14,7 +14,7 @@ def predict_function(params):
     R_earth = 6371004
 
     import os, glob, cv2, time, torch, math, re
-    from math import sin, cos, arcsin, arccos, pi
+    from math import sin, cos, asin, acos, pi
     from options.test_options import TestOptions
     from data import create_dataset
     from models import create_model
@@ -220,10 +220,10 @@ def predict_function(params):
         [lon_dr, lat_dr] = num2deg(y_max, x_max, zoom)
 
         c_width = sin(lat_ul)*sin(lat_ul) + cos(lat_ul)*cos(lat_ul)*cos(lon_ul-lon_dr)
-        distance_width = R_earth * arccos(c_width) * pi / 180
+        distance_width = R_earth * acos(c_width) * pi / 180
 
         c_height = sin(lat_ul)*sin(lat_dr) + cos(lat_ul)*cos(lat_dr)*cos(lon_ul-lon_ul)
-        distance_height = R_earth * arccos(c_height) * pi / 180
+        distance_height = R_earth * acos(c_height) * pi / 180
 
         # tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         tfw = []
