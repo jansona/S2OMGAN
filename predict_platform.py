@@ -200,7 +200,6 @@ def predict_function(params):
         zoom = opt.zoom
         coord_width = zoom2width[zoom]
                 
-        tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         base_path = in_path + "/"
         file_template = "{:0%dd}_{:0%dd}." %(coord_width, coord_width) + temp_suffix_name
         tile_files = []
@@ -226,10 +225,14 @@ def predict_function(params):
         c_height = sin(lat_ul)*sin(lat_dr) + cos(lat_ul)*cos(lat_dr)*cos(lon_ul-lon_ul)
         distance_height = R_earth * arccos(c_height) * pi / 180
 
-        tfw[0] = distance_width / map_pic.shape[1]
-        tfw[3] = distance_height / map_pic.shape[0]
-
+        # tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
+        tfw = []
+        tfw[0] = "{:.10f}".format(distance_width / map_pic.shape[1])
+        tfw[1] = "{:.10f}".format(0)
+        tfw[2] = "{:.10f}".format(0)
+        tfw[3] = "{:.10f}".format(distance_height / map_pic.shape[0])
         tfw.extend([x_min, y_min])
+
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
         for i in range(6):
             tfw_name = str(tfw[i])+'\n'
