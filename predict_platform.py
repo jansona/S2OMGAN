@@ -158,7 +158,7 @@ def predict_function(params):
         result_dir_path = '/'.join(opt.RESULT_PATH.split('/')[:-1])
         temp_img_paths = []
         temp_suffix_name = glob("{}/*".format(source_path))[0].split('.')[-1]
-        for name_path in []:#glob("{}/*".format(source_path)):
+        for name_path in glob("{}/*".format(source_path)):
             img_name = name_path.split("/")[-1]
             input_img = Image.open(name_path).convert('RGB')
             transform_params = get_params(opt, input_img.size)
