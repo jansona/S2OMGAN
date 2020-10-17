@@ -58,7 +58,7 @@ def predict_function(params):
         map_cated = rows[0]
         
         for row in rows[1:]:
-            map_cated = np.concatenate((map_cated, row), axis=0)
+            map_cated = np.concatenate((row, map_cated), axis=0)
             
         return map_cated
 
