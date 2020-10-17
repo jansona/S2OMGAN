@@ -10,7 +10,11 @@ def predict_function(params):
         17: 6
     }
 
+    # 地球平均半径，以米为单位
+    R_earth = 6371004
+
     import os, glob, cv2, time, torch, math, re
+    from math import sin, cos, arcsin, arccos, pi
     from options.test_options import TestOptions
     from data import create_dataset
     from models import create_model
@@ -213,8 +217,19 @@ def predict_function(params):
         # nimg = AutoContrast(map_pic, 3)
         # cv2.imwrite(os.path.join(out_path, "{}_{}_autocontrast.jpg".format(y_min, x_min)), nimg)
         
-        [lon,lat] = num2deg(x_min, y_min, zoom)
-        tfw.extend([lon,lat])
+        [lon_ul, lat_ul] = num2deg(y_min, x_min, zoom)
+        [lon_dr, lat_dr] = num2deg(y_max, x_max, zoom)
+
+        c_width = sin(lat_ul)*sin(lat_ul) + cos(lat_ul)*cos(lat_ul)*cos(lon_ul-lon_dr)
+        distance_width = R_earth * arccos(c_width) * pi / 180
+
+        c_height = sin(lat_ul)*sin(lat_dr) + cos(lat_ul)*cos(lat_dr)*cos(lon_ul-lon_ul)
+        distance_height = R_earth * arccos(c_height) * pi / 180
+
+        tfw[0] = distance_width / map_pic.shape[1]
+        tfw[3] = distance_height / map_pic.shape[0]
+
+        tfw.extend([x_min, y_min])
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
         for i in range(6):
             tfw_name = str(tfw[i])+'\n'
