@@ -111,7 +111,7 @@ def predict_function(params):
         imgout = imgout.astype(np.uint8)
         return imgout
 
-    def num2deg(x, xy, zoom):
+    def num2deg(x, y, zoom):
         '''这个地方有错误，关于形参与实参的位置'''
         n = 2**zoom
         lon_deg = x/n*360.0-180.0
