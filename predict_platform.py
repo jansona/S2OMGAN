@@ -219,19 +219,26 @@ def predict_function(params):
         [lon_ul, lat_ul] = num2deg(y_min, x_min, zoom)
         [lon_dr, lat_dr] = num2deg(y_max, x_max, zoom)
 
-        c_width = sin(lat_ul)*sin(lat_ul) + cos(lat_ul)*cos(lat_ul)*cos(lon_ul-lon_dr)
-        distance_width = R_earth * acos(c_width) * pi / 180
+        # c_width = sin(lat_ul)*sin(lat_ul) + cos(lat_ul)*cos(lat_ul)*cos(lon_ul-lon_dr)
+        # distance_width = R_earth * acos(c_width) * pi / 180
 
-        c_height = sin(lat_ul)*sin(lat_dr) + cos(lat_ul)*cos(lat_dr)*cos(lon_ul-lon_ul)
-        distance_height = R_earth * acos(c_height) * pi / 180
+        # c_height = sin(lat_ul)*sin(lat_dr) + cos(lat_ul)*cos(lat_dr)*cos(lon_ul-lon_ul)
+        # distance_height = R_earth * acos(c_height) * pi / 180
 
-        # tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
-        tfw = []
-        tfw.append("{:.10f}".format(distance_width / map_pic.shape[1]))
+        # # tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
+        # tfw = []
+        # tfw.append("{:.10f}".format(distance_width / map_pic.shape[1]))
+        # tfw.append("{:.10f}".format(0))
+        # tfw.append("{:.10f}".format(0))
+        # tfw.append("{:.10f}".format(distance_height / map_pic.shape[0]))
+        # tfw.extend([x_min, y_min])
+
+        tfw = list()
+        tfw.append("{:.10f}".format(math.abs(lon_dr - lon_ul) / map_pic.shape[1]))
         tfw.append("{:.10f}".format(0))
         tfw.append("{:.10f}".format(0))
-        tfw.append("{:.10f}".format(distance_height / map_pic.shape[0]))
-        tfw.extend([x_min, y_min])
+        tfw.append("{:.10f}".format(math.abs(lat_dr - lat_ul) / map_pic.shape[0]))
+        tfw.extend([lon_ul, lat_ul])
 
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
         for i in range(6):
