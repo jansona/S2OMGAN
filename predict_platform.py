@@ -7,7 +7,8 @@ def predict_function(params):
 
     # 地图尺度与坐标位宽的映射
     zoom2width = {
-        17: 6
+        17: 6,
+        18: 6
     }
 
     # 地球平均半径，以米为单位
