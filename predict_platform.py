@@ -234,10 +234,10 @@ def predict_function(params):
         # tfw.extend([x_min, y_min])
 
         tfw = list()
-        tfw.append("{:.10f}".format(math.abs(lon_dr - lon_ul) / map_pic.shape[1]))
+        tfw.append("{:.10f}".format(abs(lon_dr - lon_ul) / map_pic.shape[1]))
         tfw.append("{:.10f}".format(0))
         tfw.append("{:.10f}".format(0))
-        tfw.append("{:.10f}".format(math.abs(lat_dr - lat_ul) / map_pic.shape[0]))
+        tfw.append("{:.10f}".format(abs(lat_dr - lat_ul) / map_pic.shape[0]))
         tfw.extend([lon_ul, lat_ul])
 
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
