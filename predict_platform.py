@@ -110,7 +110,8 @@ def predict_function(params):
         imgout = imgout.astype(np.uint8)
         return imgout
 
-    def num2deg(y, x, zoom):
+    def num2deg(x, xy, zoom):
+        '''这个地方有错误，关于形参与实参的位置'''
         n = 2**zoom
         lon_deg = x/n*360.0-180.0
         lat_deg = math.atan(math.sinh(math.pi * (1 - 2 * y / n)))
@@ -237,7 +238,7 @@ def predict_function(params):
         tfw.append("{:.10f}".format(abs(lon_dr - lon_ul) / map_pic.shape[1]))
         tfw.append("{:.10f}".format(0))
         tfw.append("{:.10f}".format(0))
-        tfw.append("{:.10f}".format(abs(lat_dr - lat_ul) / map_pic.shape[0]))
+        tfw.append("{:.10f}".format(-abs(lat_dr - lat_ul) / map_pic.shape[0]))
         tfw.extend([lon_ul, lat_ul])
 
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
