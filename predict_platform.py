@@ -227,10 +227,10 @@ def predict_function(params):
 
         # tfw = ['0.0000107288', '0.0000000000', '0.0000000000', '-0.00000811273']
         tfw = []
-        tfw[0] = "{:.10f}".format(distance_width / map_pic.shape[1])
-        tfw[1] = "{:.10f}".format(0)
-        tfw[2] = "{:.10f}".format(0)
-        tfw[3] = "{:.10f}".format(distance_height / map_pic.shape[0])
+        tfw.append("{:.10f}".format(distance_width / map_pic.shape[1]))
+        tfw.append("{:.10f}".format(0))
+        tfw.append("{:.10f}".format(0))
+        tfw.append("{:.10f}".format(distance_height / map_pic.shape[0]))
         tfw.extend([x_min, y_min])
 
         file_tfw=open(opt.RESULT_PATH.split('.')[0] + '.tfw', mode='w')
