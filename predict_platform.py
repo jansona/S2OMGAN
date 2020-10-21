@@ -92,7 +92,6 @@ def batch_generate(params):
     opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
     opt.load_size = opt.crop_size
     opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-    opt.dataset = 'bare'
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)      # create a model given opt.model and other options
     # load model from a path - for platform
@@ -192,7 +191,7 @@ def predict_function(params):
 
         fake_params = list()
         fake_params.extend(['XXX.py', '--MODEL_FILE', opt.MODEL_FILE, '--DATA_PATH', source_path,
-            '--OUTPUT_PATH', result_dir_path, '--model', opt.model])
+            '--OUTPUT_PATH', result_dir_path, '--model', opt.model, '--dataset_mode', 'bare'])
         web_dir = batch_generate(fake_params)
 
         # # automatic integrate and autocontrast - for platform
