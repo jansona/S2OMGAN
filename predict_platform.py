@@ -222,34 +222,34 @@ def predict_function(params):
         opt.dataset_mode = 'bare'
         web_dir = batch_generate(opt)
 
-        # # automatic integrate and autocontrast - for platform
-        # print("start integrating...")
+        # automatic integrate and autocontrast - for platform
+        print("start integrating...")
         
-        # # in_path = webpage.get_image_dir()
-        # in_path = result_dir_path 
-        # # out_path = in_path[:-6] + "integrated"
-        # out_path = in_path
-        # if not os.path.exists(out_path):
-        #     os.makedirs(out_path)
+        # in_path = webpage.get_image_dir()
+        in_path = result_dir_path 
+        # out_path = in_path[:-6] + "integrated"
+        out_path = in_path
 
-        # x_min, x_max, y_min, y_max = statis_value(in_path)
-        # x_size = x_max - x_min + 1
-        # y_size = y_max - y_min + 1
-        # zoom = opt.zoom
-        # coord_width = zoom2width[zoom]
+        x_min, x_max, y_min, y_max = statis_value(in_path)
+        x_size = x_max - x_min + 1
+        y_size = y_max - y_min + 1
+        zoom = opt.zoom
+        coord_width = zoom2width[zoom]
                 
-        # base_path = in_path + "/"
-        # file_template = "{:0%dd}_{:0%dd}." %(coord_width, coord_width) + temp_suffix_name
-        # tile_files = []
-        # for i in range(x_size):
-        #     temp_list = []
-        #     for j in range(y_size):
-        #         temp_list.append(file_template.format(y_min + j, x_min + i))
+        base_path = in_path + "/"
+        file_template = "{:0%dd}_{:0%dd}." %(coord_width, coord_width) + temp_suffix_name
+        tile_files = []
+        for i in range(x_size):
+            temp_list = []
+            for j in range(y_size):
+                temp_list.append(file_template.format(y_min + j, x_min + i))
                 
-        #     tile_files.append(temp_list)
+            tile_files.append(temp_list)
     
-        # map_pic = integrate_tiles(result_dir_path, tile_files)
-        # cv2.imwrite(opt.RESULT_PATH, map_pic)
+        map_pic = integrate_tiles(result_dir_path, tile_files)
+        cv2.imwrite(opt.RESULT_PATH, map_pic)
+
+        os.removedirs(web_dir)
 
     else:
         input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
