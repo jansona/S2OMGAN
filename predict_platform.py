@@ -128,13 +128,17 @@ def batch_generate(params):
             break
         model.set_input(data)  # unpack data from data loader
         model.test()           # run inference
-        visuals = model.get_current_visuals()  # get image results
-        img_path = model.get_image_paths()     # get image paths
-        if i > 0 and (i + 1) % 10 == 0:  # save images to an HTML file
-            print('processing (%04d)-th image... %s' % (len(img_path)+(i)*opt.batch_size, ''), 'cost', time.time()-lasttime, 'seconds')
-            lasttime = time.time()
-        save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
-    webpage.save()  # save the HTML
+        # visuals = model.get_current_visuals()  # get image results
+        # img_path = model.get_image_paths()     # get image paths
+        # if i > 0 and (i + 1) % 10 == 0:  # save images to an HTML file
+        #     print('processing (%04d)-th image... %s' % (len(img_path)+(i)*opt.batch_size, ''), 'cost', time.time()-lasttime, 'seconds')
+        #     lasttime = time.time()
+        # save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
+        visual = model.real_B
+        img_path = model.img_paths
+        print(img_path, web_dir)
+
+    # webpage.save()  # save the HTML
     print("Work Done!!!")
     print('Generated', len(dataset), 'maps. Total Time Cost: ', lasttime - starttime, 'seconds')
 
