@@ -48,6 +48,8 @@ def save_image(image_numpy, image_path):
         image_numpy (numpy array) -- input numpy array
         image_path (str)          -- the path of the image
     """
+    image_numpy = (np.transpose(image_numpy.detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
+    image_numpy = image_numpy.astype(np.uint8)
     image_pil = Image.fromarray(image_numpy)
     image_pil.save(image_path)
 
