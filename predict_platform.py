@@ -11,7 +11,6 @@ from util import html
 from scipy.signal import convolve2d
 from util.visualizer import save_images, util as v_util
 from data.base_dataset import BaseDataset, get_params, get_transform
-# import util
 
 # 地图尺度与坐标位宽的映射
 zoom2width = {
@@ -21,6 +20,36 @@ zoom2width = {
 
 # 地球平均半径，以米为单位
 R_earth = 6371004
+
+def tensor2im(input_image, imtype=np.uint8):
+    """"Converts a Tensor array into a numpy image array.
+
+    Parameters:
+        input_image (tensor) --  the input image tensor array
+        imtype (type)        --  the desired type of the converted numpy array
+    """
+    if not isinstance(input_image, np.ndarray):
+        if isinstance(input_image, torch.Tensor):  # get the data from a variable
+            image_tensor = input_image.data
+        else:
+            return input_image
+        image_numpy = image_tensor[0].cpu().float().numpy()  # convert it into a numpy array
+        if image_numpy.shape[0] == 1:  # grayscale to RGB
+            image_numpy = np.tile(image_numpy, (3, 1, 1))
+        image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0  # post-processing: tranpose and scaling
+    else:  # if it is a numpy array, do nothing
+        image_numpy = input_image
+    return image_numpy.astype(imtype)
+
+def save_image(image_numpy, image_path):
+    """Save a numpy image to the disk
+
+    Parameters:
+        image_numpy (numpy array) -- input numpy array
+        image_path (str)          -- the path of the image
+    """
+    image_pil = Image.fromarray(image_numpy)
+    image_pil.save(image_path)
 
 def integrate_tiles(d_name, tile_mat: [[str]]) -> np.array:
 
@@ -113,12 +142,10 @@ def batch_generate(params):
     sha = hashlib.sha256()
     sha.update(str(time.time()).encode('utf-8'))
     web_dir = opt.OUTPUT_PATH + "/" + sha.hexdigest()# specific output dir - for platform
-    webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
     # test with eval mode. This only affects layers like batchnorm and dropout.
     # For [pix2pix]: we use batchnorm and dropout in the original pix2pix. You can experiment it with and without eval() mode.
     # For [CycleGAN]: It should not affect CycleGAN as CycleGAN uses instancenorm without dropout.
     starttime = time.time()
-    lasttime = starttime
     
     if opt.eval:
         model.eval()
@@ -129,12 +156,12 @@ def batch_generate(params):
         model.set_input_predict(data)  # unpack data from data loader
         model.test()           # run inference
         visual = model.fake_B
-        img_path = model.image_paths
-        img_name = img_path.split('/')[-1]
-        outimg = Image.fromarray(visual)
-        outimg.save("{}/{}".format(web_dir, img_name))
+        im = tensor2im(visual)
+        img_paths = model.image_paths
+        img_name = img_paths[0].split('/')[-1]
+        save_image(im, "{}/{}".format(web_dir, img_name))
 
-    # webpage.save()  # save the HTML
+    lasttime = time.time()
     print("Work Done!!!")
     print('Generated', len(dataset), 'maps. Total Time Cost: ', lasttime - starttime, 'seconds')
 
