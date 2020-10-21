@@ -107,11 +107,8 @@ def num2deg(x, y, zoom):
     return [lon_deg, lat_deg]
 
 
-def batch_generate(params):
+def batch_generate(opt):
 
-    sys.argv = params
-
-    opt = TestOptions().parse()  # get test options
     opt.dataroot = opt.DATA_PATH
 #     opt.epoch = 200
     # hard-code some parameters for test
@@ -172,7 +169,7 @@ def batch_generate(params):
 def predict_function(params):
 
     sys.argv = params
-    sys.argv.extend(['--gpu_ids', '-1'])
+    # sys.argv.extend(['--gpu_ids', '-1'])
     opt = TestOptions().parse()  # get test options
     opt.name = "demo_pretrained"
 #     opt.epoch = 200
@@ -217,10 +214,13 @@ def predict_function(params):
         temp_img_paths = []
         temp_suffix_name = glob("{}/*".format(source_path))[0].split('.')[-1]
 
-        fake_params = list()
-        fake_params.extend(['XXX.py', '--MODEL_FILE', opt.MODEL_FILE, '--DATA_PATH', source_path,
-            '--OUTPUT_PATH', result_dir_path, '--model', opt.model, '--dataset_mode', 'bare'])
-        web_dir = batch_generate(fake_params)
+        # fake_params = list()
+        # fake_params.extend(['XXX.py', '--MODEL_FILE', opt.MODEL_FILE, '--DATA_PATH', source_path,
+        #     '--OUTPUT_PATH', result_dir_path, '--model', opt.model, '--dataset_mode', 'bare'])
+        opt.DATA_PATH = source_path
+        opt.OUTPUT_PATH = result_dir_path
+        opt.dataset_mode = 'bare'
+        web_dir = batch_generate(opt)
 
         # # automatic integrate and autocontrast - for platform
         # print("start integrating...")
