@@ -109,6 +109,10 @@ class SomGANModel(BaseModel):
         self.real_B = input['B' if AtoB else 'A'].to(self.device)
         self.image_paths = input['A_paths' if AtoB else 'B_paths']
 
+    def set_input_predict(self, input):
+        self.real_A = input['A'].to(self.device)
+        self.image_paths = input['A_paths']
+
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
         if self.isTrain:
