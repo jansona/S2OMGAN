@@ -142,6 +142,7 @@ def batch_generate(params):
     sha = hashlib.sha256()
     sha.update(str(time.time()).encode('utf-8'))
     web_dir = opt.OUTPUT_PATH + "/" + sha.hexdigest()# specific output dir - for platform
+    webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
     # test with eval mode. This only affects layers like batchnorm and dropout.
     # For [pix2pix]: we use batchnorm and dropout in the original pix2pix. You can experiment it with and without eval() mode.
     # For [CycleGAN]: It should not affect CycleGAN as CycleGAN uses instancenorm without dropout.
