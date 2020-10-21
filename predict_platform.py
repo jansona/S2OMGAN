@@ -83,9 +83,9 @@ def integrate_tiles(d_name, tile_mat: [[str]]) -> np.array:
         
     return map_cated
 
-def statis_value(in_path):
+def statis_value(in_path, suffix):
     name_list = os.listdir(in_path)
-    name_list = list(filter(lambda x: re.match("\d+_\d+.png", x), name_list))
+    name_list = list(filter(lambda x: re.match("\d+_\d+.".format(suffix), x), name_list))
     y_list = []
     x_list = []
     for name in name_list:
@@ -230,7 +230,8 @@ def predict_function(params):
         # out_path = in_path[:-6] + "integrated"
         out_path = in_path
 
-        x_min, x_max, y_min, y_max = statis_value(in_path)
+        print(in_path)
+        x_min, x_max, y_min, y_max = statis_value(in_path, suffix='png')
         x_size = x_max - x_min + 1
         y_size = y_max - y_min + 1
         zoom = opt.zoom
