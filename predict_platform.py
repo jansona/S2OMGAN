@@ -126,7 +126,7 @@ def batch_generate(params):
     for i, data in enumerate(dataset):
         if i >= opt.num_test:  # only apply our model to opt.num_test images.
             break
-        model.set_input(data)  # unpack data from data loader
+        model.set_input_predict(data)  # unpack data from data loader
         model.test()           # run inference
         # visuals = model.get_current_visuals()  # get image results
         # img_path = model.get_image_paths()     # get image paths
@@ -134,7 +134,7 @@ def batch_generate(params):
         #     print('processing (%04d)-th image... %s' % (len(img_path)+(i)*opt.batch_size, ''), 'cost', time.time()-lasttime, 'seconds')
         #     lasttime = time.time()
         # save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
-        visual = model.real_B
+        visual = model.fake_B
         img_path = model.img_paths
         print(img_path, web_dir)
 
