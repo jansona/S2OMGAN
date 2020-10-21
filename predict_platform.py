@@ -229,6 +229,7 @@ def predict_function(params):
 
         # automatic integrate and autocontrast - for platform
         print("start integrating...")
+        starttime = time.time()
         
         # in_path = webpage.get_image_dir()
         in_path = web_dir
@@ -260,6 +261,9 @@ def predict_function(params):
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
         os.removedirs(web_dir)
+
+        lasttime = time.time()
+        print('Integration done!', 'Total Time Cost: ', lasttime - starttime, 'seconds')
 
     else:
         input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
