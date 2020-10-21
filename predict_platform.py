@@ -226,12 +226,11 @@ def predict_function(params):
         print("start integrating...")
         
         # in_path = webpage.get_image_dir()
-        in_path = result_dir_path 
+        in_path = web_dir
         # out_path = in_path[:-6] + "integrated"
         out_path = in_path
 
-        print(in_path)
-        x_min, x_max, y_min, y_max = statis_value(in_path, suffix='png')
+        x_min, x_max, y_min, y_max = statis_value(in_path, temp_suffix_name)
         x_size = x_max - x_min + 1
         y_size = y_max - y_min + 1
         zoom = opt.zoom
@@ -247,9 +246,14 @@ def predict_function(params):
                 
             tile_files.append(temp_list)
     
-        map_pic = integrate_tiles(result_dir_path, tile_files)
+        map_pic = integrate_tiles(web_dir, tile_files)
         cv2.imwrite(opt.RESULT_PATH, map_pic)
 
+        for root, dirs, files in os.walk(web_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
         os.removedirs(web_dir)
 
     else:
