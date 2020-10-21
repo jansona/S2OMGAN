@@ -48,7 +48,7 @@ def save_image(image_numpy, image_path):
         image_numpy (numpy array) -- input numpy array
         image_path (str)          -- the path of the image
     """
-    image_numpy = (np.transpose(image_numpy.numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
+    image_numpy = (np.transpose(image_numpy.cpu().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
     image_numpy = image_numpy.astype(np.uint8)
     image_pil = Image.fromarray(image_numpy)
     image_pil.save(image_path)
@@ -156,11 +156,11 @@ def batch_generate(opt):
         model.set_input_predict(data)  # unpack data from data loader
         model.test()           # run inference
 
-        for i in len(model.fake_B):
+        for i in range(len(model.fake_B)):
             visual = model.fake_B[i]
             img_path = model.image_paths[i]
             
-            im = tensor2im(visual)
+            im = tensor2im([visual])[0]
             img_name = img_path.split('/')[-1]
             save_image(im, "{}/{}".format(web_dir, img_name))
 
