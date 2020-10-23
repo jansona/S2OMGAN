@@ -1,4 +1,4 @@
-import sys, os, cv2, time, math, json, re, hashlib
+import sys, os, cv2, time, math, json, re, hashlib, shutil
 import torch
 from glob import glob
 import numpy as np
@@ -214,7 +214,7 @@ def predict_function(params):
     source_path = opt.IMAGE_PATH
 
     if os.path.isdir(source_path):
-        opt.RESULT_PATH = opt.RESULT_PATH.split('.')[0] + '.tif'
+        opt.RESULT_PATH = ".".join(opt.RESULT_PATH.split('.')[:-1]) + '.tif'
         result_dir_path = '/'.join(opt.RESULT_PATH.split('/')[:-1])
         temp_img_paths = []
         temp_suffix_name = glob("{}/*".format(source_path))[0].split('.')[-1]
@@ -264,6 +264,11 @@ def predict_function(params):
 
         lasttime = time.time()
         print('Integration done!', 'Total Time Cost: ', lasttime - starttime, 'seconds')
+
+        # copy tfw
+        tfw_path_dest = ".".join(opt.RESULT_PATH.split('.')[:-1]) + '.tfw'
+        tfw_path_sour = glob("{}/*.tfw".format(opt.IMAGE_PATH))[0]
+        shutil.copy(tfw_path_sour, tfw_path_dest)
 
     else:
         input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
