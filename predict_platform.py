@@ -175,7 +175,7 @@ def predict_function(params):
 
     sys.argv = params
     # sys.argv.extend(['--gpu_ids', '-1'])
-    opt = TestOptions().parse()  # get test options
+    opt = TestOptions().parse(False)  # get test options
     opt.name = "demo_pretrained"
 #     opt.epoch = 200
     # hard-code some parameters for test

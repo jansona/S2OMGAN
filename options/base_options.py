@@ -102,7 +102,7 @@ class BaseOptions():
         self.parser = parser
         return parser.parse_args()
 
-    def print_options(self, opt):
+    def print_options(self, opt, is_save=True):
         """Print and save options
 
         It will print both current options and default values(if different).
@@ -120,14 +120,15 @@ class BaseOptions():
         print(message)
 
         # save to the disk
-        expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
-        util.mkdirs(expr_dir)
-        file_name = os.path.join(expr_dir, '{}_opt.txt'.format(opt.phase))
-        with open(file_name, 'wt') as opt_file:
-            opt_file.write(message)
-            opt_file.write('\n')
+        if is_save:
+            expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
+            util.mkdirs(expr_dir)
+            file_name = os.path.join(expr_dir, '{}_opt.txt'.format(opt.phase))
+            with open(file_name, 'wt') as opt_file:
+                opt_file.write(message)
+                opt_file.write('\n')
 
-    def parse(self):
+    def parse(self, is_save=True):
         """Parse our options, create checkpoints directory suffix, and set up gpu device."""
         opt = self.gather_options()
         opt.isTrain = self.isTrain   # train or test
@@ -137,7 +138,7 @@ class BaseOptions():
             suffix = ('_' + opt.suffix.format(**vars(opt))) if opt.suffix != '' else ''
             opt.name = opt.name + suffix
 
-        self.print_options(opt)
+        self.print_options(opt, is_save)
 
         # set gpu ids
         str_ids = opt.gpu_ids.split(',')
