@@ -282,7 +282,7 @@ def predict_function(params):
         x = model.fake_B[0]
     #     print(type(x), x.shape, x)
 
-        x = (np.transpose(x.detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
+        x = (np.transpose(x.cpu().detach().numpy(), (1, 2, 0)) + 1) / 2.0 * 255.0
         x = x.astype(np.uint8)
 
         outimg = Image.fromarray(x)
