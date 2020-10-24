@@ -265,10 +265,10 @@ def predict_function(params):
         lasttime = time.time()
         print('Integration done!', 'Total Time Cost: ', lasttime - starttime, 'seconds')
 
-        # copy tfw
-        tfw_path_dest = ".".join(opt.RESULT_PATH.split('.')[:-1]) + '.tfw'
-        tfw_path_sour = glob("{}/*.tfw".format(opt.IMAGE_PATH))[0]
-        shutil.copy(tfw_path_sour, tfw_path_dest)
+        # # copy tfw
+        # tfw_path_dest = ".".join(opt.RESULT_PATH.split('.')[:-1]) + '.tfw'
+        # tfw_path_sour = glob("{}/*.tfw".format(opt.IMAGE_PATH))[0]
+        # shutil.copy(tfw_path_sour, tfw_path_dest)
 
     else:
         input_img = Image.open(opt.IMAGE_PATH).convert('RGB')
