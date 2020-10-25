@@ -173,6 +173,11 @@ def batch_generate(opt):
 
 def predict_function(params):
 
+    # region 适配平台的模型文件默认位置设定
+    file_abs_path = os.path.abspath(__file__)
+    opt.MODEL_FILE = os.path.join(file_abs_path, "map_generation.pth")
+    # endregion
+
     sys.argv = params
     # sys.argv.extend(['--gpu_ids', '-1'])
     opt = TestOptions().parse(False)  # get test options
