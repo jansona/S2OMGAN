@@ -64,7 +64,7 @@ class BaseOptions():
         parser.add_argument('--CHECKPOINT_PATH', default='./checkpoints', type=str, help='tmp')
         parser.add_argument('--TEST_FILE_PATH', default='', type=str, help='tmp')
         parser.add_argument('--PB_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--CLASSES_NUM', default='适配平台的目标识别类型数目参数，无意义', type=str, help='tmp')
+        parser.add_argument('--CLASSES', default='适配平台的目标识别类型数目参数，无意义', type=str, help='tmp')
         parser.add_argument('--RESULT_PATH', default='./results', type=str, help='tmp')
         parser.add_argument('--OUTPUT_PATH', default='', type=str, help='tmp')
         parser.add_argument('--MODEL_FILE', default='', type=str, help='tmp')
