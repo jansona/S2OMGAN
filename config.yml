@@ -1,0 +1,52 @@
+dependencies:
+  framework: 
+    name: pytorch
+    version: 1.5.0
+  packages:
+  - name: dominate
+    version: 2.3.5
+  - name: numpy
+    version: 1.16.2
+  - name: opencv-python
+    version: 4.1.0.25
+  - name: opencv-python-headless
+    version: 4.4.0.46
+  - name: scipy
+    version: 1.2.0
+  - name: visdom
+    version: 0.1.8.8
+
+# classes:
+#   car,swimming_pool
+
+train:
+  script:
+    SMAPGAN/train.py
+  inputParams:
+    TRAIN_FILE_PATH: train
+    VAL_FILE_PATH: val
+    CLASSES_NUM: -1 # 无实际意义
+    BATCH_SIZE: 1
+  outputParams:
+    LOG_PATH: monitor
+    CHECKPOINT_PATH: checkpoints
+# 输出参数必须是文件路径或文件夹路径
+
+evaluate:
+  script:
+    SMAPGAN/test.py
+  inputParams:
+    TEST_FILE_PATH: test
+    MODEL_FILE: latest_net_G_A.pth
+    TEST_BATCH_SIZE: 2
+  outputParams:
+    RESULT_PATH: testResult.json
+
+inference:
+  script:
+    SMAPGAN/predict.py
+  inputParams:
+    IMAGE_PATH: shanghai1010_Level17 # 可为图片文件或包含图片文件的文件夹
+    MODEL_FILE: latest_net_G_A.pth
+  outputParams:
+    RESULT_PATH: result.jpg
