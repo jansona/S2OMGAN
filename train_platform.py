@@ -1,3 +1,9 @@
+import sys, time, os, torch
+from options.train_options import TrainOptions
+from data import create_dataset
+from models import create_model
+from util.visualizer import Visualizer
+
 
 def train_function(params):
 
@@ -10,11 +16,6 @@ def train_function(params):
         Train a S2OMGAN model:
             python train.py --dataroot ./datasets/maps --name maps_somgan --model somgan
     """
-    import sys, time, os, torch
-    from options.train_options import TrainOptions
-    from data import create_dataset
-    from models import create_model
-    from util.visualizer import Visualizer
 
     try:
         from torch.utils.tensorboard import SummaryWriter
@@ -30,7 +31,7 @@ def train_function(params):
     sys.argv = params
 
     opt = TrainOptions().parse()   # get training options
-    opt.dataroot = opt.DATA_PATH
+    opt.dataroot = opt.TRAIN_FILE_PATH
     
     opt.dataset_mode = 'aligned'
     if os.path.exists(opt.dataroot + "/train"):
@@ -142,3 +143,8 @@ def train_function(params):
         net.cuda(model.gpu_ids[0])
     else:
         torch.save(net.cpu().state_dict(), opt.CHECKPOINT_PATH)
+
+
+if __name__ == '__main__':
+
+    train_function(sys.argv)

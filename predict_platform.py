@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from math import sin, cos, asin, acos, pi
 from options.test_options import TestOptions
+from options.predict_options import PredictOptions
 from data import create_dataset
 from models import create_model
 from util import html
@@ -53,14 +54,14 @@ def save_image(image_numpy, image_path):
     image_pil = Image.fromarray(image_numpy)
     image_pil.save(image_path)
 
-def integrate_tiles(d_name, tile_mat: [[str]]) -> np.array:
+def integrate_tiles(d_name, tile_mat) -> np.array:
 
     for line in tile_mat:
         for tile in line:
             if not os.path.exists("{}/{}".format(d_name, tile)):
                 print(d_name, tile)
     
-    def assemble_row(row_files: [str]) -> np.array:
+    def assemble_row(row_files) -> np.array:
         
         tile_cated = cv2.imread(os.path.join(d_name, row_files[0]))
         
@@ -175,7 +176,7 @@ def predict_function(params):
 
     sys.argv = params
     # sys.argv.extend(['--gpu_ids', '-1'])
-    opt = TestOptions().parse(False)  # get test options
+    opt = PredictOptions().parse(False)  # get test options
     opt.name = "demo_pretrained"
 
     # region 适配平台的模型文件默认位置设定

@@ -17,7 +17,13 @@ class TestOptions(BaseOptions):
         parser.add_argument('--eval', action='store_true', help='use eval mode during test time.')
         parser.add_argument('--num_test', type=int, default=5000, help='how many test images to run')
 
-        parser.add_argument('--zoom', type=int, default=17, help='the level of geo data')
+        # for AI platform
+        parser.add_argument('--TEST_FILE_PATH', type=str, help='训练集路径')
+        parser.add_argument('--MODEL_FILE', default='', type=str, help='导入模型文件路径')
+        parser.add_argument('--CLASSES', default='', type=str, help='适配平台的目标识别类型数目参数，无意义')
+        parser.add_argument('--RESULT_PATH', default='testResult.json', type=str, help='测试日志文件路径')
+        parser.add_argument('--OUTPUT_PATH', default='generated', type=str, help='生成结果路径')
+
         # rewrite devalue values
         # parser.set_defaults(model='test')
         # To avoid cropping, the load_size should be the same as crop_size

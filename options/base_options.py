@@ -57,20 +57,9 @@ class BaseOptions():
         # used to put all the images in a single dir
         parser.add_argument('--single_dir', action='store_true', help='')
         # for platform tmp
-        parser.add_argument('--DATA_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--TRAIN_FILE_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--VAL_FILE_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--LOG_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--CHECKPOINT_PATH', default='./checkpoints', type=str, help='tmp')
-        parser.add_argument('--TEST_FILE_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--PB_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--CLASSES', default='适配平台的目标识别类型数目参数，无意义', type=str, help='tmp')
-        parser.add_argument('--RESULT_PATH', default='./results', type=str, help='tmp')
-        parser.add_argument('--OUTPUT_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--MODEL_FILE', default='', type=str, help='tmp')
-        parser.add_argument('--PREDICT_CLASSES', default='', type=str, help='tmp')
-        parser.add_argument('--IMAGE_PATH', default='', type=str, help='tmp')
-        parser.add_argument('--IMAGE_BASE64', default='', type=str, help='tmp')
+        # parser.add_argument('--DATA_PATH', default='', type=str, help='')
+        # parser.add_argument('--PREDICT_CLASSES', default='', type=str, help='tmp')
+        # parser.add_argument('--IMAGE_BASE64', default='', type=str, help='tmp')
         self.initialized = True
         return parser
 

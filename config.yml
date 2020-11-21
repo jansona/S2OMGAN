@@ -16,31 +16,30 @@ dependencies:
   - name: visdom
     version: 0.1.8.8
 
-# classes:
-#   car,swimming_pool
+classes:
+  car,swimming_pool
 
 train:
   script:
-    SMAPGAN/train.py
+    S2OMGAN-Variant/train_platform.py
   inputParams:
-    TRAIN_FILE_PATH: train
-    VAL_FILE_PATH: val
-    CLASSES_NUM: -1 # 无实际意义
-    BATCH_SIZE: 1
+    TRAIN_FILE_PATH: SomeGoogleMap15/谷歌影像无标注谷歌地图无标注metadata/15/15_15aligned/
+    VAL_FILE_PATH: val # 无实际意义
   outputParams:
     LOG_PATH: monitor
-    CHECKPOINT_PATH: checkpoints
+    CHECKPOINT_PATH: latest_net_G_A.pth
 # 输出参数必须是文件路径或文件夹路径
 
 evaluate:
   script:
-    SMAPGAN/test.py
+    S2OMGAN-Variant/test_platform.py
   inputParams:
-    TEST_FILE_PATH: test
+    TEST_FILE_PATH: SomeGoogleMap15/谷歌影像无标注谷歌地图无标注metadata/15/15_15aligned/
     MODEL_FILE: latest_net_G_A.pth
-    TEST_BATCH_SIZE: 2
+    test_num: 100
   outputParams:
     RESULT_PATH: testResult.json
+    OUTPUT_PATH: generated
 
 inference:
   script:

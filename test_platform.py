@@ -1,3 +1,13 @@
+import sys, os, glob, cv2, time, torch, math
+from options.test_options import TestOptions
+from data import create_dataset
+from models import create_model
+from util.visualizer import save_images
+from util import html
+import numpy as np
+from scipy.signal import convolve2d
+import json
+
 
 def test_function(params):
     """General-purpose test script for image-to-image translation.
@@ -31,16 +41,6 @@ def test_function(params):
     See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
     See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
     """
-    import sys, os, glob, cv2, time, torch, math
-    from options.test_options import TestOptions
-    from data import create_dataset
-    from models import create_model
-    from util.visualizer import save_images
-    from util import html
-    import numpy as np
-    from scipy.signal import convolve2d
-    import json
-
 
     def MSE(pic1, pic2):
         return np.sum(np.square(pic1 - pic2)) / (pic1.shape[0] * pic1.shape[1])
@@ -77,9 +77,9 @@ def test_function(params):
         lat_deg=lat_deg*180.0/math.pi
         return [lon_deg,lat_deg]
 
-    def integrate_tiles(tile_mat: [[str]]) -> np.array:
+    def integrate_tiles(tile_mat) -> np.array:
         
-        def assemble_row(row_files: [str]) -> np.array:
+        def assemble_row(row_files) -> np.array:
             
             tile_cated = cv2.imread(os.path.join(d_name,row_files[0]))
             
@@ -185,7 +185,7 @@ def test_function(params):
     sys.argv = params
 
     opt = TestOptions().parse()  # get test options
-    opt.dataroot = opt.DATA_PATH
+    opt.dataroot = opt.TEST_FILE_PATH
 #     opt.epoch = 200
     # hard-code some parameters for test
     opt.num_threads = 0   # test code only supports num_threads = 1
@@ -313,3 +313,8 @@ def test_function(params):
 
     with open(opt.RESULT_PATH, "w") as jsonof:
         json.dump(r_report, jsonof, ensure_ascii=False)
+
+
+if __name__ == "__main__":
+
+    test_function(sys.argv)
